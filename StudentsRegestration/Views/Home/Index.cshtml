@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title = "Registration";
+}
+
+<div style="border:2px solid gray; margin-top:10px; padding:10px 25px; border-radius:5px;">
+    <div>
+        <label class="label-info">
+            Course:
+        </label>
+        <select id="courses"></select>
+    </div>
+    <br />
+    <div>
+        <label class="label-info">
+            Student:
+        </label>
+        <select id="students"></select>
+    </div>
+
+    <br />
+    <div>
+        <button class="btn btn-primary" id="submit">
+            Register
+        </button>
+    </div>
+
+</div>
+
+<br />
+
+<div style="margin:10px auto; border:2px solid black; border-radius:5px;">
+    <div style="margin: 10px; padding: 5px;">
+        <table id="tbregistration" class="table-hover" cellspacing="0" data-page-length='25'>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Course Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css" />
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            GetCourses();
+            GetStudents();
+            bindTable();
+        });
+
+        $("#submit").click(function () {
+            var CourseID = parseInt($("#courses").val());
+            var StudentID = parseInt($("#students").val());
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Register")',
+                data: { CourseID: CourseID, StudentID: StudentID },
+                datatype: JSON,
+                success: function (data) {
+                    if (data != null) {
+                        console.log(data.data);
+                        if (data.data == "1") {
+                            alert("Register in a course :D");
+                            bindTable();
+                        }
+                    } else {
+
+                    }
+                },
+                error: function(data) {}
+            });
+        });
+
+        var bindTable = function() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetRegitrationData")',
+                datatype: JSON,
+                success: function(data) {
+                    $('#tbregistration tbody').empty();
+                    var rows = "";
+                    $.each(data, function (i, item) {
+                        item = $.parseJSON(item);
+                        $.each(item, function (i, item2) {
+                            console.log(item2);
+                            rows = "<tr><td>" + (i + 1) + "</td><td>" + item2.FirstName + " " + item2.LastName + "</td> <td>" + item2.CourseName + "</td></tr>";
+                            $('#tbregistration tbody').append(rows);
+
+                        });
+
+                    });
+                  //  $('#tbregistration tbody').append(rows);
+                    $('#tbregistration').DataTable();
+                },
+                error: function(data) {}
+            });
+        }
+
+        var GetStudents = function() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetStudents")',
+                datatype: JSON,
+                success: function (data) {
+                    var rows = "";
+                    $.each(data, function (i, item) {
+                        item = $.parseJSON(item);
+                        $.each(item, function (i, item2) {
+                            console.log(item2);
+                            rows += "<option value='" + item2.ID + "'>" + item2.FirstName + "  " + item2.LastName + "</option>";
+                        });
+
+                    });
+                    $('#students').append(rows);
+                },
+                error: function(data) {}
+            });
+        }
+
+        var GetCourses = function() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetCourses")',
+                datatype: JSON,
+                success: function (data) {
+                    var rows = "";
+                    $.each(data, function (i, item) {
+                        item = $.parseJSON(item);
+                        $.each(item, function (i, item2) {
+                            console.log(item2);
+                            rows += "<option value='" + item2.CourseID + "'>" + item2.CourseName + "</option>";
+                        });
+
+                    });
+                    $('#courses').append(rows);
+                },
+                error: function(data) {}
+            });
+        }
+
+
+    </script>
+
+}
