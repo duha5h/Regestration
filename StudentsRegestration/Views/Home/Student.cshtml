@@ -1,0 +1,66 @@
+﻿
+@{
+    ViewBag.Title = "Student";
+}
+
+<h2 id="studentName"> </h2>
+<h1 hidden id="StudentID">@ViewBag.StudentID</h1>
+<br />
+<h3>Register in <span id="numOfCourses"></span></h3>
+
+<div style="width: 500px">
+    <ol class="list-group" id="courses">
+
+    </ol>
+
+</div>
+
+
+@section scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            GetStudentData();
+        });
+
+        var GetStudentData = function () {
+            console.log($("#StudentID").text());
+            var StudentID = parseInt($("#StudentID").text());
+            var count = 0;
+
+             $.ajax({
+                type: 'GET',
+                 url: '@Url.Action("GetStudentData")',
+                 data: { StudentID: StudentID },
+                datatype: JSON,
+                success: function (data) {
+                    var rows = "";
+                    console.log(data);
+                    $.each(data, function (i, item) {
+                        item = $.parseJSON(item);
+                        var items = "";
+                        $.each(item, function (i, item2) {
+                            console.log(item2);
+                            studentName = item2.FirstName + "  " + item2.LastName;
+                            items += "<li class='list-group-item'>" + item2.CourseName + "</li>";
+                            count++;
+                        });
+
+                        $("#studentName").text(studentName);
+                        if (count == 1) {
+                            $("#numOfCourses").text(count + " course");
+                        } else {
+                            $("#numOfCourses").text(count + " courses");
+                        }
+                        $("#courses").append(items);
+
+                    });
+                },
+                error: function(data) {}
+            });
+        }
+    </script>
+
+}
+

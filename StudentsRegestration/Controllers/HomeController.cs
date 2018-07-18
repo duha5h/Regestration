@@ -9,9 +9,17 @@ namespace StudentsRegestration.Controllers
 {
     public class HomeController : Controller
     {
+
+
         public ActionResult Index()
         {
             return View();
+        }
+
+        public ActionResult Student()
+        {
+            ViewBag.StudentID = StudentsRegestration.Models.Student.StudentID;
+            return View("Student");
         }
 
         [HttpGet]
@@ -49,8 +57,23 @@ namespace StudentsRegestration.Controllers
             var services = new Registration().Register(CourseID, StudentID) ;
             JsonResult jsonResult = Json(new { data = services }, JsonRequestBehavior.AllowGet);
             return jsonResult;
-            
-
         }
+
+
+        [HttpPost]
+        public void ChangeStudentID(int StudentID)
+        {
+            StudentsRegestration.Models.Student.StudentID = StudentID;
+        }
+
+        [HttpGet]
+        public JsonResult GetStudentData(int StudentID)
+        {
+
+            var courses = new Student().GetStudentData(StudentID);
+            JsonResult jsonResult = Json(new { data = courses }, JsonRequestBehavior.AllowGet);
+            return jsonResult;
+        }
+
     }
 }

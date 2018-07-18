@@ -7,14 +7,14 @@
         <label class="label-info">
             Course:
         </label>
-        <select id="courses"></select>
+        <select class="form-control" id="courses"></select>
     </div>
     <br />
     <div>
         <label class="label-info">
             Student:
         </label>
-        <select id="students"></select>
+        <select class="form-control" id="students"></select>
     </div>
 
     <br />
@@ -34,6 +34,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th hidden></th>
                     <th>Student Name</th>
                     <th>Course Name</th>
                 </tr>
@@ -58,6 +59,27 @@
             bindTable();
         });
 
+        var StudentID;
+
+        $('#tbregistration tbody').on('click', 'tr', function () {
+            StudentID = $(this).find('.StudentID').text();
+            console.log(StudentID);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ChangeStudentID")',
+                data: { StudentID: StudentID },
+                datatype: JSON,
+                success: function (data) {
+                    console.log("hello");
+                    window.open('@Url.Action("Student")');
+                },
+                error: function (data) {
+                    alert("Faild to load page!");
+
+                }
+            });
+        });
+
         $("#submit").click(function () {
             var CourseID = parseInt($("#courses").val());
             var StudentID = parseInt($("#students").val());
@@ -71,10 +93,17 @@
                     if (data != null) {
                         console.log(data.data);
                         if (data.data == "1") {
-                            alert("Register in a course :D");
+                            alert("Success register in a course :D");
                             bindTable();
+                            location.reload();
+
+                        } else if (data.data == "2") {
+                            alert("You already register in a course :D");
+                        } else {
+                            alert("Faild to register in course, try again later.");
                         }
                     } else {
+                        alert("Faild to register in course, try again later.");
 
                     }
                 },
@@ -94,13 +123,13 @@
                         item = $.parseJSON(item);
                         $.each(item, function (i, item2) {
                             console.log(item2);
-                            rows = "<tr><td>" + (i + 1) + "</td><td>" + item2.FirstName + " " + item2.LastName + "</td> <td>" + item2.CourseName + "</td></tr>";
-                            $('#tbregistration tbody').append(rows);
+                            rows += "<tr><td>" + (i + 1) + "</td><td hidden class='StudentID'>" + item2.ID + "</td><td>" + item2.FirstName + " " + item2.LastName + "</td> <td>" + item2.CourseName + "</td></tr>";
+                         //   $('#tbregistration tbody').append(rows);
 
                         });
 
                     });
-                  //  $('#tbregistration tbody').append(rows);
+                    $('#tbregistration tbody').append(rows);
                     $('#tbregistration').DataTable();
                 },
                 error: function(data) {}
